@@ -31,20 +31,40 @@ bot.on("text", async (ctx) => {
         // get role 
         const chatMemberRole = await ctx.telegram.getChatMember(groupId, chatId)
 
-        if(chatMemberRole.status == "creator" || chatMemberRole.status == "adminstrator"){
-            const userId = ctx.message.reply_to_message.from.id
-            if(message == "/ban") {
+        if(message.startsWith('/')){
+            if(chatMemberRole.status == "creator" || chatMemberRole.status == "adminstrator"){
+                const userId = ctx.message.reply_to_message.from.id
+                if(message == "/ban") {
+                        ctx.restrictChatMember(userId, {
+                        until_date: untilDate,
+                        can_send_messages: false
+                    })
+                    ctx.reply(`کاربر ${ctx.message.reply_to_message.from.first_name} با موفقیت بن شد`)
+                }
+                else if(message == "/unban"){
                     ctx.restrictChatMember(userId, {
-                    until_date: untilDate,
-                    can_send_messages: false
-                })
-                ctx.reply(`کاربر ${ctx.message.reply_to_message.from.first_name} با موفقیت بن شد`)
-            }
-            else if(message == "/unban"){
-                ctx.restrictChatMember(userId, {
-                    can_send_messages: true
-                })
-                ctx.reply(`کاربر ${ctx.message.reply_to_message.from.first_name} با موفقیت آزاد شد`)
+                        can_send_messages: true
+                    })
+                    ctx.reply(`کاربر ${ctx.message.reply_to_message.from.first_name} با موفقیت آزاد شد`)
+                }else if(message == "/promote"){
+                    ctx.promoteChatMember(userId, {
+                        can_promote_members: true,
+                        can_pin_messages: true,
+                        can_change_info: true,
+                        can_send_polls: true
+                    })
+                } else if(message == "/demote"){
+                    ctx.restrictChatMember(userId,{
+                        permissions: {
+                            can_promote_members: false,
+                            can_pin_messages: false,
+                            can_change_info: false,
+                            can_send_polls: false
+                        }
+                    })
+                }
+            } else {
+                ctx.reply("شما دسترسی این کارو نداری!")
             }
         }
     }
